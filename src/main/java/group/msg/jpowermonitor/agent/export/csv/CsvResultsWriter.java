@@ -32,8 +32,8 @@ public class CsvResultsWriter implements ResultsWriter {
     private static final String dataPointFormatEnergyConsumptionCsv;
 
     static {
-        dataPointFormatCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s%s";
-        dataPointFormatEnergyConsumptionCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s,%s%s";
+        dataPointFormatCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s%s";
+        dataPointFormatEnergyConsumptionCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s,%s,%s%s";
     }
 
     private final String energyConsumptionPerMethodFileName;
@@ -60,21 +60,25 @@ public class CsvResultsWriter implements ResultsWriter {
 
     @Override
     public void writePowerConsumptionPerMethod(Map<String, DataPoint> measurements) {
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, true);
         writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, true);
     }
 
     @Override
     public void writePowerConsumptionPerMethodFiltered(Map<String, DataPoint> measurements) {
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, true);
         writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, true);
     }
 
     @Override
     public void writeEnergyConsumptionPerMethod(Map<String, DataPoint> measurements) {
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
         writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
     }
 
     @Override
     public void writeEnergyConsumptionPerMethodFiltered(Map<String, DataPoint> measurements) {
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
         writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
     }
 
@@ -87,6 +91,7 @@ public class CsvResultsWriter implements ResultsWriter {
     protected String createCsvEntryForDataPoint(@NotNull DataPoint dp) {
         if (Unit.JOULE == dp.getUnit()) {
             return String.format(dataPointFormatEnergyConsumptionCsv,
+                dp.getSystemTime(),
                 DATE_TIME_FORMATTER.format(dp.getTime()),
                 dp.getThreadName(),
                 dp.getName(),
@@ -97,6 +102,7 @@ public class CsvResultsWriter implements ResultsWriter {
                 NEW_LINE);
         }
         return String.format(dataPointFormatCsv,
+            dp.getSystemTime(),
             DATE_TIME_FORMATTER.format(dp.getTime()),
             dp.getThreadName(),
             dp.getName(),

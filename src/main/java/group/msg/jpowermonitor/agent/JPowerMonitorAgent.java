@@ -88,14 +88,14 @@ public class JPowerMonitorAgent {
             CsvResultsWriter cw = new CsvResultsWriter();
             long delayAndPeriodCw = javaAgentCfg.getWriteEnergyMeasurementsToCsvIntervalInS() * ONE_SECOND_IN_MILLIS;
             // start Timer as daemon thread, so that it does not prevent applications from stopping
-            energyToCsvTimer.schedule(
+            /*energyToCsvTimer.schedule(
                 new TimerTask() {
                     @Override
                     public void run() {
                         cw.writeEnergyConsumptionPerMethod(powerMeasurementCollector.getEnergyConsumptionPerMethod(false));
                         cw.writeEnergyConsumptionPerMethodFiltered(powerMeasurementCollector.getEnergyConsumptionPerMethod(true));
                     }
-                }, delayAndPeriodCw, delayAndPeriodCw);
+                }, delayAndPeriodCw, delayAndPeriodCw);*/
             log.debug("Scheduled CsvResultsWriter with delay {} ms and period {} ms", delayAndPeriodCw, delayAndPeriodCw);
         }
         if (javaAgentCfg.getMonitoring().getPrometheus().isEnabled()) {

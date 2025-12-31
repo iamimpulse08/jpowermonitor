@@ -113,7 +113,7 @@ public class CommaSeparatedValuesReader implements MeasureMethod {
                 throw new JPowerMonitorException("File '" + csvInputFile.toAbsolutePath().normalize() + "' does not contain configured column " + column.getIndex());
             }
             Double value = parseDoubleFromColumnConfig(csvInputFile, values[column.getIndex()]);
-            return new DataPoint(column.getName(), value, Unit.WATT, LocalDateTime.now(), null);
+            return new DataPoint(column.getName(), value, Unit.WATT, LocalDateTime.now(), null, System.currentTimeMillis());
         } catch (IOException ex) {
             throw new JPowerMonitorException("Cannot read measurements from file '" + csvInputFile.toAbsolutePath().normalize() + "'");
         } catch (InterruptedException e) {

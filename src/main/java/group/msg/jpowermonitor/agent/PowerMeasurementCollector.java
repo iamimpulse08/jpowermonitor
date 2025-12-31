@@ -57,7 +57,7 @@ public class PowerMeasurementCollector extends TimerTask {
      */
     @Getter
     private final AtomicReference<DataPoint> energyConsumptionTotalInJoule =
-        new AtomicReference<>(new DataPoint("energyConsumptionTotalInJoule", 0.0, Unit.JOULE, LocalDateTime.now(), null));
+        new AtomicReference<>(new DataPoint("energyConsumptionTotalInJoule", 0.0, Unit.JOULE, LocalDateTime.now(), null, System.currentTimeMillis()));
     private final Map<String, Long> threadsCpuTime = new HashMap<>();
     private final Map<String, DataPoint> energyConsumptionPerMethod = new ConcurrentHashMap<>();
     private final long measurementInterval;
@@ -128,6 +128,9 @@ public class PowerMeasurementCollector extends TimerTask {
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
 
+
+        //activities.sort(t -> t.getTime().);
+
         Map<String, DataPoint> powerConsumption = aggregateActivityToDataPoints(activities, false);
         Map<String, DataPoint> filteredPowerConsumption = aggregateActivityToDataPoints(activities, true);
         csvResultsWriter.writePowerConsumptionPerMethod(powerConsumption);
@@ -160,7 +163,7 @@ public class PowerMeasurementCollector extends TimerTask {
                 MethodActivity activity = new MethodActivity();
                 activity.setThreadName(threadName);
                 activity.setTime(LocalDateTime.now());
-
+                activity.setSystemTime(System.currentTimeMillis());
                 Arrays.stream(stackTrace)
                     .findFirst()
                     .map(PowerMeasurementCollector::getFullQualifiedMethodName)
@@ -186,7 +189,8 @@ public class PowerMeasurementCollector extends TimerTask {
             .anyMatch(method::startsWith);
     }
 
-    private void allocateEnergyUsageToActivity(Map<String, Set<MethodActivity>> methodActivityPerThread, Map<String, Double> powerPerApplicationThread) {
+    private void allocateEnergyUsageToActivity(Map<String, Set<MethodActivity>> methodActivityPerThread,
+                                               Map<String, Double> powerPerApplicationThread) {
         for (Map.Entry<String, Set<MethodActivity>> entry : methodActivityPerThread.entrySet()) {
             String threadName = entry.getKey();
 
@@ -233,7 +237,8 @@ public class PowerMeasurementCollector extends TimerTask {
             quantity.map(Quantity::getValue).orElse(null),
             quantity.map(Quantity::getUnit).orElse(null),
             activity.getTime(),
-            activity.getThreadName()
+            activity.getThreadName(),
+            activity.getSystemTime()
         );
     }
 
@@ -297,7 +302,7 @@ public class PowerMeasurementCollector extends TimerTask {
         AtomicReference<Double> sum = new AtomicReference<>(0.0);
         Arrays.stream(dataPoints).filter(dp -> areDataPointsAddable(reference, dp))
             .forEach(dp -> sum.getAndAccumulate(dp.getValue(), Double::sum));
-        return new DataPoint(reference.getName(), sum.get(), reference.getUnit(), LocalDateTime.now(), reference.getThreadName());
+        return new DataPoint(reference.getName(), sum.get(), reference.getUnit(), LocalDateTime.now(), reference.getThreadName(), System.currentTimeMillis());
     }
 
     /**
@@ -311,6 +316,6 @@ public class PowerMeasurementCollector extends TimerTask {
      * @return <code>DataPoint</code> with new <code>unit</code>
      */
     public DataPoint cloneAndCalculateDataPoint(@NotNull DataPoint dp, @NotNull Unit unit, Function<Double, Double> valueTransformer) {
-        return new DataPoint(dp.getName(), valueTransformer.apply(dp.getValue()), unit, dp.getTime(), dp.getThreadName());
+        return new DataPoint(dp.getName(), valueTransformer.apply(dp.getValue()), unit, dp.getTime(), dp.getThreadName(), System.currentTimeMillis());
     }
 }

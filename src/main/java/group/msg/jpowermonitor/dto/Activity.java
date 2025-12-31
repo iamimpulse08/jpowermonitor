@@ -39,4 +39,9 @@ public interface Activity {
      * has been attributed already
      */
     boolean isFinalized();
+
+    /**
+     * @return Returns the system time (system.currentMilis() from when the activity was measured).
+     */
+    long getSystemTime();
 }

@@ -46,7 +46,7 @@ public class LibreHardwareMonitorReader implements MeasureMethod {
         DataElem root = objectMapper.readValue(response.getEntity().getContent(), DataElem.class);
         List<DataPoint> result = new ArrayList<>();
         for (PathElementCfg pathElement : paths) {
-            DataPoint dp = createDataPoint(root, pathElement, time);
+            DataPoint dp = createDataPoint(root, pathElement, time, System.currentTimeMillis());
             result.add(dp);
         }
         return result;
@@ -66,7 +66,7 @@ public class LibreHardwareMonitorReader implements MeasureMethod {
         LocalDateTime time = LocalDateTime.now();
         ObjectMapper objectMapper = new ObjectMapper();
         DataElem root = objectMapper.readValue(response.getEntity().getContent(), DataElem.class);
-        return createDataPoint(root, pathElement, time);
+        return createDataPoint(root, pathElement, time, System.currentTimeMillis());
     }
 
     @Override
@@ -80,7 +80,7 @@ public class LibreHardwareMonitorReader implements MeasureMethod {
     }
 
     @NotNull
-    private DataPoint createDataPoint(DataElem root, PathElementCfg pathElement, LocalDateTime time) {
+    private DataPoint createDataPoint(DataElem root, PathElementCfg pathElement, LocalDateTime time, long systemTimeMillis) {
         DataElem elem = findElement(root, pathElement.getPath().toArray());
         if (elem == null) {
             throw new JPowerMonitorException("Unable to find element for path " + pathElement.getPath() + "!");
@@ -88,7 +88,7 @@ public class LibreHardwareMonitorReader implements MeasureMethod {
         String[] valueAndUnit = elem.getValue().split("\\s+");// (( "5,4 W" ))
         Double value = Double.valueOf(valueAndUnit[0].replace(',', '.').trim());
         Unit unit = Unit.fromAbbreviation(valueAndUnit[1].trim());
-        return new DataPoint(String.join("->", pathElement.getPath()), value, unit, time, null);
+        return new DataPoint(String.join("->", pathElement.getPath()), value, unit, time, null, systemTimeMillis);
     }
 
     @Override

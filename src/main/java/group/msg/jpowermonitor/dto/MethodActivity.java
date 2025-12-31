@@ -11,6 +11,7 @@ public class MethodActivity implements Activity {
     String methodQualifier;
     String filteredMethodQualifier;
     Quantity representedQuantity;
+    long systemTime;
 
     @Override
     public String getIdentifier(boolean asFiltered) {
@@ -20,5 +21,10 @@ public class MethodActivity implements Activity {
     @Override
     public boolean isFinalized() {
         return representedQuantity != null;
+    }
+
+    @Override
+    public long getSystemTime() {
+        return systemTime;
     }
 }

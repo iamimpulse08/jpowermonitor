@@ -220,11 +220,11 @@ public class JPowerMonitorExtension implements BeforeAllCallback, BeforeEachCall
 
     private DataPoint calculateAvg(@NotNull List<DataPoint> dataPoints) {
         if (dataPoints.isEmpty()) {
-            return new DataPoint("No Datapoints for Average", 0.0, Unit.NONE, LocalDateTime.now(), null);
+            return new DataPoint("No Datapoints for Average", 0.0, Unit.NONE, LocalDateTime.now(), null, System.currentTimeMillis());
         }
         DataPoint reference = dataPoints.get(0);
         double avg = dataPoints.stream().mapToDouble(DataPoint::getValue).average().orElse(0.0);
-        return new DataPoint(reference.getName(), roundScale2(avg), reference.getUnit(), LocalDateTime.now(), reference.getThreadName());
+        return new DataPoint(reference.getName(), roundScale2(avg), reference.getUnit(), LocalDateTime.now(), reference.getThreadName(), System.currentTimeMillis());
     }
 
     private String getTestName(ExtensionContext context) {

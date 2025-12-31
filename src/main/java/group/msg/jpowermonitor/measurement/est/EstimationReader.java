@@ -39,7 +39,7 @@ public class EstimationReader implements MeasureMethod {
     public @NotNull DataPoint measureFirstConfiguredPath() throws JPowerMonitorException {
         final double cpuUsage = getCpuUsage();
         double value = estCfg.getCpuMinWatts() + (cpuUsage * (estCfg.getCpuMaxWatts() - estCfg.getCpuMinWatts()));
-        return new DataPoint(ESTIMATED_CPU_WATTS, value, Unit.WATT, LocalDateTime.now(), Thread.currentThread().getName());
+        return new DataPoint(ESTIMATED_CPU_WATTS, value, Unit.WATT, LocalDateTime.now(), Thread.currentThread().getName(), System.currentTimeMillis());
     }
 
     @Override

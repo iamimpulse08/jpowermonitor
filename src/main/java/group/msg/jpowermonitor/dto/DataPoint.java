@@ -17,13 +17,14 @@ public class DataPoint implements PowerQuestionable {
     Unit unit;
     LocalDateTime time;
     String threadName;
+    long systemTime;
 
     /**
      * The CO2 value in grams, only != null, if the Unit is WATT (energy value).
      */
     Double co2Value;
 
-    public DataPoint(String name, Double value, Unit unit, LocalDateTime time, String threadName) {
+    public DataPoint(String name, Double value, Unit unit, LocalDateTime time, String threadName, long systemTime) {
         this.name = name;
         this.value = value;
         this.unit = unit;
@@ -34,5 +35,6 @@ public class DataPoint implements PowerQuestionable {
         } else {
             co2Value = null;
         }
+        this.systemTime = systemTime;
     }
 }
