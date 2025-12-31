@@ -58,11 +58,28 @@ public class CsvResultsWriter implements ResultsWriter {
         log.debug("Energy consumption per filtered methods is written to '{}'", energyConsumptionPerFilteredMethodFileName);
     }
 
-    public void writeHeaders() {
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
+    public enum FILE_TYPE {
+        FILTERED, NOT_FILTERED, BOTH
+    }
+
+    public void writeHeaders(FILE_TYPE fileType) {
+
+        switch (fileType) {
+            case FILTERED -> {
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
+            }
+            case NOT_FILTERED -> {
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
+            }
+            case BOTH -> {
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
+                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
+            }
+        }
     }
 
     @Override
