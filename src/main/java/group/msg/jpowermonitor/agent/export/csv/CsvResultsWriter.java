@@ -58,28 +58,28 @@ public class CsvResultsWriter implements ResultsWriter {
         log.debug("Energy consumption per filtered methods is written to '{}'", energyConsumptionPerFilteredMethodFileName);
     }
 
+    public void writeHeaders() {
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+    }
+
     @Override
     public void writePowerConsumptionPerMethod(Map<String, DataPoint> measurements) {
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, true);
         writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, true);
     }
 
     @Override
     public void writePowerConsumptionPerMethodFiltered(Map<String, DataPoint> measurements) {
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, true);
         writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, true);
     }
 
     @Override
     public void writeEnergyConsumptionPerMethod(Map<String, DataPoint> measurements) {
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
-        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
+        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, true);
     }
 
     @Override
     public void writeEnergyConsumptionPerMethodFiltered(Map<String, DataPoint> measurements) {
-        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
-        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, true);
     }
 
     protected String createCsv(Map<String, DataPoint> measurements) {

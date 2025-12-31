@@ -133,6 +133,7 @@ public class PowerMeasurementCollector extends TimerTask {
 
         Map<String, DataPoint> powerConsumption = aggregateActivityToDataPoints(activities, false);
         Map<String, DataPoint> filteredPowerConsumption = aggregateActivityToDataPoints(activities, true);
+        csvResultsWriter.writeHeaders();
         csvResultsWriter.writePowerConsumptionPerMethod(powerConsumption);
         csvResultsWriter.writePowerConsumptionPerMethodFiltered(filteredPowerConsumption);
         if (prometheusWriter != null) {
