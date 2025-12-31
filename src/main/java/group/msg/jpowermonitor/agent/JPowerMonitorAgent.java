@@ -7,6 +7,7 @@ import group.msg.jpowermonitor.config.DefaultCfgProvider;
 import group.msg.jpowermonitor.config.dto.JPowerMonitorCfg;
 import group.msg.jpowermonitor.config.dto.JavaAgentCfg;
 import group.msg.jpowermonitor.config.dto.MeasureMethodKey;
+import group.msg.jpowermonitor.dto.DataPoint;
 import group.msg.jpowermonitor.measurement.est.EstimationReader;
 import group.msg.jpowermonitor.util.Constants;
 import group.msg.jpowermonitor.util.CpuAndThreadUtils;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ThreadMXBean;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -85,17 +87,18 @@ public class JPowerMonitorAgent {
         log.debug("Scheduled PowerMeasurementCollector with delay {} ms and period {} ms", delayAndPeriodPmc, delayAndPeriodPmc);
         // TimerTask to write energy measurement statistics to CSV files while application still running
         if (javaAgentCfg.getWriteEnergyMeasurementsToCsvIntervalInS() > 0) {
-            CsvResultsWriter cw = new CsvResultsWriter();
             long delayAndPeriodCw = javaAgentCfg.getWriteEnergyMeasurementsToCsvIntervalInS() * ONE_SECOND_IN_MILLIS;
             // start Timer as daemon thread, so that it does not prevent applications from stopping
-            /*energyToCsvTimer.schedule(
+            energyToCsvTimer.schedule(
                 new TimerTask() {
                     @Override
                     public void run() {
-                        cw.writeEnergyConsumptionPerMethod(powerMeasurementCollector.getEnergyConsumptionPerMethod(false));
-                        cw.writeEnergyConsumptionPerMethodFiltered(powerMeasurementCollector.getEnergyConsumptionPerMethod(true));
+                        // Compiler should theoretically optimise this out by assigning the variables to null as soon as they're used.
+                        Map<String, DataPoint> energyConsumptionPerMethod = powerMeasurementCollector.getEnergyConsumptionPerMethod(false);
+                        Map<String, DataPoint> energyConsumptionPerMethodFiltered = powerMeasurementCollector.getEnergyConsumptionPerMethod(true);
+                        powerMeasurementCollector.printCSVDataWithDataSizeChecks(energyConsumptionPerMethod, energyConsumptionPerMethodFiltered, CsvResultsWriter.FILE_TYPE.BOTH);
                     }
-                }, delayAndPeriodCw, delayAndPeriodCw);*/
+                }, delayAndPeriodCw, delayAndPeriodCw);
             log.debug("Scheduled CsvResultsWriter with delay {} ms and period {} ms", delayAndPeriodCw, delayAndPeriodCw);
         }
         if (javaAgentCfg.getMonitoring().getPrometheus().isEnabled()) {
@@ -125,9 +128,12 @@ public class JPowerMonitorAgent {
         );
         // at shutdown write last results to CSV files and write statistics
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // Compiler should theoretically optimise this out by assigning the variables to null as soon as they're used.
+
+            /*Map<String, DataPoint> energyConsumptionPerMethod = powerMeasurementCollector.getEnergyConsumptionPerMethod(false);
+            Map<String, DataPoint> energyConsumptionPerMethodFiltered = powerMeasurementCollector.getEnergyConsumptionPerMethod(true);
+            powerMeasurementCollector.printCSVDataWithDataSizeChecks(energyConsumptionPerMethod, energyConsumptionPerMethodFiltered, CsvResultsWriter.FILE_TYPE.BOTH);*/
             CsvResultsWriter rw = new CsvResultsWriter();
-            rw.writeEnergyConsumptionPerMethod(powerMeasurementCollector.getEnergyConsumptionPerMethod(false));
-            rw.writeEnergyConsumptionPerMethodFiltered(powerMeasurementCollector.getEnergyConsumptionPerMethod(true));
             new StatisticsWriter(powerMeasurementCollector).writeStatistics(rw);
         }));
     }

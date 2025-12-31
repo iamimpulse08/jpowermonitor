@@ -75,6 +75,10 @@ public class PowerMeasurementCollector extends TimerTask {
     @Setter
     private long correctionMeasureStackActivityInMs;
 
+    /**
+     * Keep a local reference if headers have already been printed.
+     */
+    private boolean headersPrinted = false;
 
     public PowerMeasurementCollector(long pid, ThreadMXBean threadMXBean, JavaAgentCfg javaAgentCfg) {
         this.measurementInterval = javaAgentCfg.getMeasurementIntervalInMs();
@@ -134,25 +138,33 @@ public class PowerMeasurementCollector extends TimerTask {
         Map<String, DataPoint> powerConsumption = aggregateActivityToDataPoints(activities, false);
         Map<String, DataPoint> filteredPowerConsumption = aggregateActivityToDataPoints(activities, true);
 
+        printCSVDataWithDataSizeChecks(powerConsumption, filteredPowerConsumption, CsvResultsWriter.FILE_TYPE.BOTH);
+    }
+
+    // TODO : I actually don't think nullability needs to be checked, we could probably assume that the data coming in is != null
+    public void printCSVDataWithDataSizeChecks(Map<String, DataPoint> powerConsumption, Map<String, DataPoint> filteredPowerConsumption, CsvResultsWriter.FILE_TYPE fileType) {
+
+        if (!headersPrinted) {
+            csvResultsWriter.writeHeaders(fileType);
+            headersPrinted = true;
+        }
+
+        // only write per-method consumption
         // if both datapoint maps have nothing in them, don't even bother doing anything since the system probably exited harshly (?)
         // if power consumption has data, then write NOT_FILTERED values, because it will output power and energy consumption.
         if (!powerConsumption.isEmpty() && !filteredPowerConsumption.isEmpty()) {
-            csvResultsWriter.writeHeaders(CsvResultsWriter.FILE_TYPE.BOTH);
-
             csvResultsWriter.writePowerConsumptionPerMethod(powerConsumption);
             csvResultsWriter.writePowerConsumptionPerMethodFiltered(filteredPowerConsumption);
+            csvResultsWriter.writeEnergyConsumptionPerMethod(energyConsumptionPerMethod);
 
             return;
         }
-
-        // if either map has data, write it to file.
+        // if either map has data, write it to a file.
         if (!powerConsumption.isEmpty()) {
-            csvResultsWriter.writeHeaders(CsvResultsWriter.FILE_TYPE.NOT_FILTERED);
             csvResultsWriter.writePowerConsumptionPerMethod(powerConsumption);
         }
 
         if (!filteredPowerConsumption.isEmpty()) {
-            csvResultsWriter.writeHeaders(CsvResultsWriter.FILE_TYPE.FILTERED);
             csvResultsWriter.writePowerConsumptionPerMethodFiltered(filteredPowerConsumption);
         }
 

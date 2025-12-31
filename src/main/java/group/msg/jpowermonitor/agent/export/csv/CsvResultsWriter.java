@@ -84,25 +84,25 @@ public class CsvResultsWriter implements ResultsWriter {
 
     @Override
     public void writePowerConsumptionPerMethod(Map<String, DataPoint> measurements) {
-        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, true);
+        writeToFile(createCsvStringOutputFromMeasurements(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, true);
     }
 
     @Override
     public void writePowerConsumptionPerMethodFiltered(Map<String, DataPoint> measurements) {
-        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, true);
+        writeToFile(createCsvStringOutputFromMeasurements(measurements), resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, true);
     }
 
     @Override
     public void writeEnergyConsumptionPerMethod(Map<String, DataPoint> measurements) {
-        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, true);
+        writeToFile(createCsvStringOutputFromMeasurements(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, true);
     }
 
     @Override
     public void writeEnergyConsumptionPerMethodFiltered(Map<String, DataPoint> measurements) {
-        writeToFile(createCsv(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, true);
+        writeToFile(createCsvStringOutputFromMeasurements(measurements), resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, true);
     }
 
-    protected String createCsv(Map<String, DataPoint> measurements) {
+    protected String createCsvStringOutputFromMeasurements(Map<String, DataPoint> measurements) {
         StringBuilder csv = new StringBuilder();
         measurements.forEach((method, energy) -> csv.append(createCsvEntryForDataPoint(energy)));
         return csv.toString();
@@ -131,9 +131,9 @@ public class CsvResultsWriter implements ResultsWriter {
             NEW_LINE);
     }
 
-    protected void writeToFile(String csv, String fileName, boolean append) {
+    protected void writeToFile(String csvStringToWrite, String fileName, boolean append) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, append))) {
-            bw.write(csv);
+            bw.write(csvStringToWrite);
         } catch (IOException ex) {
             log.error(ex.getMessage(), ex);
         }
