@@ -133,10 +133,23 @@ public class PowerMeasurementCollector extends TimerTask {
 
         Map<String, DataPoint> powerConsumption = aggregateActivityToDataPoints(activities, false);
         Map<String, DataPoint> filteredPowerConsumption = aggregateActivityToDataPoints(activities, true);
-        csvResultsWriter.writeHeaders();
-        csvResultsWriter.writePowerConsumptionPerMethod(powerConsumption);
-        csvResultsWriter.writePowerConsumptionPerMethodFiltered(filteredPowerConsumption);
-        if (prometheusWriter != null) {
+
+        // if both datapoint maps have nothing in them, don't even bother doing anything since system probably exited harshly (?)
+        if (powerConsumption.isEmpty() && filteredPowerConsumption.isEmpty()) {
+            return;
+        }
+
+        // if either of the two datapoint maps have at least one point of data, they can be written to the csv file.
+        if (!powerConsumption.isEmpty()) {
+            csvResultsWriter.writePowerConsumptionPerMethod(powerConsumption);
+        }
+
+        if (!filteredPowerConsumption.isEmpty()) {
+            csvResultsWriter.writePowerConsumptionPerMethod(filteredPowerConsumption);
+        }
+
+        // if prometheus is to be written, and the results are not empty, write them.
+        if (prometheusWriter != null && !filteredPowerConsumption.isEmpty()) {
             prometheusWriter.writePowerConsumptionPerMethodFiltered(filteredPowerConsumption);
         }
     }

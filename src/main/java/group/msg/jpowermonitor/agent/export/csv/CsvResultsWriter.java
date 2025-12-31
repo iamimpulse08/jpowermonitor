@@ -60,6 +60,9 @@ public class CsvResultsWriter implements ResultsWriter {
 
     public void writeHeaders() {
         writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
+        writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
     }
 
     @Override
