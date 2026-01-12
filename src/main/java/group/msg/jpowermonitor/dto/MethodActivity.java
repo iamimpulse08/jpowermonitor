@@ -11,7 +11,8 @@ public class MethodActivity implements Activity {
     String methodQualifier;
     String filteredMethodQualifier;
     Quantity representedQuantity;
-    long systemTime;
+    long systemTimeNanos;
+    long systemTimeMillis;
 
     @Override
     public String getIdentifier(boolean asFiltered) {
@@ -23,8 +24,4 @@ public class MethodActivity implements Activity {
         return representedQuantity != null;
     }
 
-    @Override
-    public long getSystemTime() {
-        return systemTime;
-    }
 }

@@ -32,8 +32,8 @@ public class CsvResultsWriter implements ResultsWriter {
     private static final String dataPointFormatEnergyConsumptionCsv;
 
     static {
-        dataPointFormatCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s%s";
-        dataPointFormatEnergyConsumptionCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s,%s,%s%s";
+        dataPointFormatCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s,%s%s";
+        dataPointFormatEnergyConsumptionCsv = Locale.getDefault().getCountry().toLowerCase(Locale.ROOT).equals("de") ? "%s;%s;%s;%s;%s;%s;%s;%s;%s%s" : "%s,%s,%s,%s,%s,%s,%s,%s,%s%s";
     }
 
     private final String energyConsumptionPerMethodFileName;
@@ -66,18 +66,18 @@ public class CsvResultsWriter implements ResultsWriter {
 
         switch (fileType) {
             case FILTERED -> {
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time, ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time, ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
             }
             case NOT_FILTERED -> {
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
             }
             case BOTH -> {
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
-                writeToFile("SystemTime,Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerFilteredMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time,ThreadName,Method,Value,Unit,CO2Value,CO2Unit\n",resultsDirectoryOverride + "\\" + energyConsumptionPerMethodFileName, false);
+                writeToFile("SystemTimeMillis, SystemTimeMillisPrecise, Time,ThreadName,Method,Value,Unit\n",resultsDirectoryOverride + "\\" + powerConsumptionPerMethodFileName, false);
             }
         }
     }
@@ -109,9 +109,12 @@ public class CsvResultsWriter implements ResultsWriter {
     }
 
     protected String createCsvEntryForDataPoint(@NotNull DataPoint dp) {
+        String formattedSystemTime = String.format("%.4f", dp.getPreciseTimeMillis());
+
         if (Unit.JOULE == dp.getUnit()) {
             return String.format(dataPointFormatEnergyConsumptionCsv,
-                dp.getSystemTime(),
+                dp.getSystemTimeMillis(),
+                formattedSystemTime,
                 DATE_TIME_FORMATTER.format(dp.getTime()),
                 dp.getThreadName(),
                 dp.getName(),
@@ -122,7 +125,8 @@ public class CsvResultsWriter implements ResultsWriter {
                 NEW_LINE);
         }
         return String.format(dataPointFormatCsv,
-            dp.getSystemTime(),
+            dp.getSystemTimeMillis(),
+            formattedSystemTime,
             DATE_TIME_FORMATTER.format(dp.getTime()),
             dp.getThreadName(),
             dp.getName(),

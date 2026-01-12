@@ -57,7 +57,7 @@ public class PowerMeasurementCollector extends TimerTask {
      */
     @Getter
     private final AtomicReference<DataPoint> energyConsumptionTotalInJoule =
-        new AtomicReference<>(new DataPoint("energyConsumptionTotalInJoule", 0.0, Unit.JOULE, LocalDateTime.now(), null, System.currentTimeMillis()));
+        new AtomicReference<>(new DataPoint("energyConsumptionTotalInJoule", 0.0, Unit.JOULE, LocalDateTime.now(), null, System.nanoTime(), System.currentTimeMillis()));
     private final Map<String, Long> threadsCpuTime = new HashMap<>();
     private final Map<String, DataPoint> energyConsumptionPerMethod = new ConcurrentHashMap<>();
     private final long measurementInterval;
@@ -197,7 +197,8 @@ public class PowerMeasurementCollector extends TimerTask {
                 MethodActivity activity = new MethodActivity();
                 activity.setThreadName(threadName);
                 activity.setTime(LocalDateTime.now());
-                activity.setSystemTime(System.currentTimeMillis());
+                activity.setSystemTimeNanos(System.nanoTime());
+                activity.setSystemTimeMillis(System.currentTimeMillis());
                 Arrays.stream(stackTrace)
                     .findFirst()
                     .map(PowerMeasurementCollector::getFullQualifiedMethodName)
@@ -272,7 +273,8 @@ public class PowerMeasurementCollector extends TimerTask {
             quantity.map(Quantity::getUnit).orElse(null),
             activity.getTime(),
             activity.getThreadName(),
-            activity.getSystemTime()
+            activity.getSystemTimeNanos(),
+            activity.getSystemTimeMillis()
         );
     }
 
@@ -336,7 +338,7 @@ public class PowerMeasurementCollector extends TimerTask {
         AtomicReference<Double> sum = new AtomicReference<>(0.0);
         Arrays.stream(dataPoints).filter(dp -> areDataPointsAddable(reference, dp))
             .forEach(dp -> sum.getAndAccumulate(dp.getValue(), Double::sum));
-        return new DataPoint(reference.getName(), sum.get(), reference.getUnit(), LocalDateTime.now(), reference.getThreadName(), System.currentTimeMillis());
+        return new DataPoint(reference.getName(), sum.get(), reference.getUnit(), LocalDateTime.now(), reference.getThreadName(), System.nanoTime(), System.currentTimeMillis());
     }
 
     /**
@@ -350,6 +352,6 @@ public class PowerMeasurementCollector extends TimerTask {
      * @return <code>DataPoint</code> with new <code>unit</code>
      */
     public DataPoint cloneAndCalculateDataPoint(@NotNull DataPoint dp, @NotNull Unit unit, Function<Double, Double> valueTransformer) {
-        return new DataPoint(dp.getName(), valueTransformer.apply(dp.getValue()), unit, dp.getTime(), dp.getThreadName(), System.currentTimeMillis());
+        return new DataPoint(dp.getName(), valueTransformer.apply(dp.getValue()), unit, dp.getTime(), dp.getThreadName(), System.nanoTime(), System.currentTimeMillis());
     }
 }

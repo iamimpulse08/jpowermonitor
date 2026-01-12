@@ -41,7 +41,12 @@ public interface Activity {
     boolean isFinalized();
 
     /**
-     * @return Returns the system time (system.currentMilis() from when the activity was measured).
+     * @return Returns the system time (System.nanoTime() from when the activity was measured).
      */
-    long getSystemTime();
+    long getSystemTimeNanos();
+
+    /**
+     * @return Returns the system time (System.currentTimeMillis()) from when the activity was measured.
+     */
+    long getSystemTimeMillis();
 }

@@ -17,24 +17,35 @@ public class DataPoint implements PowerQuestionable {
     Unit unit;
     LocalDateTime time;
     String threadName;
-    long systemTime;
+    long systemTimeNanos;
+    long systemTimeMillis;
 
     /**
      * The CO2 value in grams, only != null, if the Unit is WATT (energy value).
      */
     Double co2Value;
 
-    public DataPoint(String name, Double value, Unit unit, LocalDateTime time, String threadName, long systemTime) {
+    public DataPoint(String name, Double value, Unit unit, LocalDateTime time, String threadName, long systemTimeNanos, long systemTimeMillis) {
         this.name = name;
         this.value = value;
         this.unit = unit;
         this.time = time;
         this.threadName = threadName;
+        this.systemTimeMillis = systemTimeMillis;
         if (Unit.JOULE.equals(unit)) {
             co2Value = Converter.convertJouleToCarbonDioxideGrams(value, JPowerMonitorCfg.getCo2EmissionFactor());
         } else {
             co2Value = null;
         }
-        this.systemTime = systemTime;
+        this.systemTimeNanos = systemTimeNanos;
+    }
+
+    /**
+     *
+     * @return the system time in millis including 4 decimal places (nanos) after millis.
+     */
+    public double getPreciseTimeMillis() {
+        long subMillisNanos = systemTimeNanos % 1_000_000L;
+        return systemTimeMillis + (subMillisNanos / 1_000_000.0);
     }
 }
