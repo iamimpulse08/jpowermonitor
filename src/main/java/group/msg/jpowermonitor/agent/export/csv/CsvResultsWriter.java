@@ -109,12 +109,10 @@ public class CsvResultsWriter implements ResultsWriter {
     }
 
     protected String createCsvEntryForDataPoint(@NotNull DataPoint dp) {
-        String formattedSystemTime = String.format("%.4f", dp.getPreciseTimeMillis());
-
         if (Unit.JOULE == dp.getUnit()) {
             return String.format(dataPointFormatEnergyConsumptionCsv,
                 dp.getSystemTimeMillis(),
-                formattedSystemTime,
+                dp.getSystemTimePrecise(),
                 DATE_TIME_FORMATTER.format(dp.getTime()),
                 dp.getThreadName(),
                 dp.getName(),
@@ -126,7 +124,7 @@ public class CsvResultsWriter implements ResultsWriter {
         }
         return String.format(dataPointFormatCsv,
             dp.getSystemTimeMillis(),
-            formattedSystemTime,
+            dp.getSystemTimePrecise(),
             DATE_TIME_FORMATTER.format(dp.getTime()),
             dp.getThreadName(),
             dp.getName(),
