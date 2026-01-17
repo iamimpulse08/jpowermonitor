@@ -106,7 +106,6 @@ public class JUnitResultsWriter {
 
     public static String createCsvEntryForDataPoint(@NotNull DataPoint dp, String namePrefix, String testName) {
         return String.format(dataPointFormatCsv,
-            DATE_TIME_FORMATTER.format(dp.getTime()),
             namePrefix + testName,
             dp.getName(),
             DECIMAL_FORMAT.format(dp.getValue()),

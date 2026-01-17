@@ -11,7 +11,6 @@ public class MethodActivity implements Activity {
     String methodQualifier;
     String filteredMethodQualifier;
     Quantity representedQuantity;
-    long systemTimeNanos;
     long systemTimeMillis;
 
     @Override

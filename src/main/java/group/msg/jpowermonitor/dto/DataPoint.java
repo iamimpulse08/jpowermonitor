@@ -5,8 +5,6 @@ import group.msg.jpowermonitor.config.dto.JPowerMonitorCfg;
 import group.msg.jpowermonitor.util.Converter;
 import lombok.Value;
 
-import java.time.LocalDateTime;
-
 /**
  * One data point. In case of energy data point, contains the co2 representation of the value, too.
  */
@@ -15,24 +13,17 @@ public class DataPoint implements PowerQuestionable {
     String name;
     Double value;
     Unit unit;
-    LocalDateTime time;
     String threadName;
     long systemTimeMillis;
-    /**
-     * The time in seconds with sub-milliseconds attached.
-     */
-    double systemTimePrecise;
-
     /**
      * The CO2 value in grams, only != null, if the Unit is WATT (energy value).
      */
     Double co2Value;
 
-    public DataPoint(String name, Double value, Unit unit, LocalDateTime time, String threadName, long systemTimeNanos, long systemTimeMillis) {
+    public DataPoint(String name, Double value, Unit unit, String threadName, long systemTimeMillis) {
         this.name = name;
         this.value = value;
         this.unit = unit;
-        this.time = time;
         this.threadName = threadName;
         this.systemTimeMillis = systemTimeMillis;
         if (Unit.JOULE.equals(unit)) {
@@ -41,8 +32,5 @@ public class DataPoint implements PowerQuestionable {
         else {
             co2Value = null;
         }
-        // small performance improvement (?)
-        // subMillisNanos = systemTimeNanos % 1_000_000L <- grabs the seconds below nano seconds as a remainder.
-        this.systemTimePrecise = this.systemTimeMillis + ((systemTimeNanos % 1_000_000L) / 1_000_000.0);
     }
 }
